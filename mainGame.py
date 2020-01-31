@@ -30,8 +30,8 @@ class dnGameWindow(QtWidgets.QWidget):
     def createWindowStyle(self, path):
         self.setGeometry(100, 100, 600, 300)
         self.setStyleSheet("QPushButton { font: 10pt Arial }")
-        bg_img = QtGui.QImage(path).scaled(QtCore.QSize(
-            600, 300))  # resize Image to widgets size
+        bg_img = QtGui.QImage(path).scaled(
+            QtCore.QSize(600, 300))  # resize Image to widgets size
         palette = QtGui.QPalette()
         palette.setBrush(10, QtGui.QBrush(bg_img))  # 10 = WindowRole
         self.setPalette(palette)
@@ -88,9 +88,10 @@ class dnGameWindow(QtWidgets.QWidget):
         self.textbox = QtWidgets.QLabel("", self)
         self.textbox.resize(250, 40)
         self.textbox.move(350, 30)
-        self.textbox.setStyleSheet("QLabel { font: 9pt Lucida Console; \
-                                    background-color: black; \
-                                    color: #88d471 }")
+        self.textbox.setStyleSheet(
+            "QLabel { font: 9pt Lucida Console; \
+                background-color: black; \
+                    color: #88d471 }")
         self.textbox.setAlignment(QtCore.Qt.AlignHCenter)
         self.textbox.setFrameStyle(
             QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken)
@@ -124,17 +125,17 @@ class dnGameWindow(QtWidgets.QWidget):
 
     def setLabelBgColor(self, label, color, alpha):
         label.setAutoFillBackground(True)
-        values = "{r}, {g}, {b}, {a}".format(r=color.red(),
-                                             g=color.green(),
-                                             b=color.blue(),
-                                             a=alpha)
+        values = "{r}, {g}, {b}, {a}".format(
+            r=color.red(),
+            g=color.green(),
+            b=color.blue(),
+            a=alpha)
         label.setStyleSheet(
             "QLabel { background-color: rgba(" + values + "); }")
         label.setFrameStyle(QtWidgets.QFrame.Panel | QtWidgets.QFrame.Raised)
         label.setLineWidth(2)
 
     def initSlider(self):
-
         self.sliderLabel = QtWidgets.QLabel('Risk Level', self)
         self.sliderLabel.move(375, 155)
         self.sliderLabelHigh = QtWidgets.QLabel('High', self)
@@ -215,7 +216,7 @@ class dnGameWindow(QtWidgets.QWidget):
         self.valsBox.show()
         self.initEntry.show()
         self.slider.show()
-        self.setGlobalMsg("Enter the first card value.")
+        self.setMessage("Enter the first card value.")
 
     def exitApp(self):
         """
@@ -223,7 +224,7 @@ class dnGameWindow(QtWidgets.QWidget):
         """
         sys.exit()
 
-    def setGlobalMsg(self, string):
+    def setMessage(self, string):
         """
         Set the text for the textbox.
         """
@@ -265,8 +266,9 @@ class dnGameWindow(QtWidgets.QWidget):
         """
         g = self.game
         score = g.getScore()
-        self.setGlobalMsg("Score: " + str(score) +
-                          ", High Score: " + str(g.getHighScore()))
+        self.setMessage(
+            "Score: " + str(score) +
+            ", High Score: " + str(g.getHighScore()))
         self.playerPhase()
 
     def gameStepBot(self, randCard, randCard2):
@@ -282,9 +284,10 @@ class dnGameWindow(QtWidgets.QWidget):
         state = bp.getState()
         bestAction = bp.getAction(g, state)
         score = g.getScore()
-        self.setGlobalMsg("Score: " + str(score) +
-                          ", High Score: " + str(g.getHighScore()) +
-                          "\n Best action is " + bestAction)
+        self.setMessage(
+            "Score: " + str(score) +
+            ", High Score: " + str(g.getHighScore()) +
+            "\n Best action is " + bestAction)
 
     def updateCardImage(self, label, path, pos):
         """
@@ -353,8 +356,9 @@ class dnGameWindow(QtWidgets.QWidget):
         """
         g = self.game
         score = g.incrementScore()
-        self.setGlobalMsg("Score: " + str(score) +
-                          ", High Score: " + str(g.getHighScore()))
+        self.setMessage(
+            "Score: " + str(score) +
+            ", High Score: " + str(g.getHighScore()))
         self.gameExitBtn.move(490, 120)
         self.transitionPhase(False)
         if not self.isHumanPlayer:
@@ -387,9 +391,10 @@ class dnGameWindow(QtWidgets.QWidget):
         state = self.botPlayer.getState()
         bestAction = self.botPlayer.getAction(g, state)
         score = g.getScore()
-        self.setGlobalMsg("Score: " + str(score) +
-                          ", High Score: " + str(g.getHighScore()) +
-                          "\n Best action is " + bestAction)
+        self.setMessage(
+            "Score: " + str(score) +
+            ", High Score: " + str(g.getHighScore()) +
+            "\n Best action is " + bestAction)
         if bestAction == "Continue?":
             self.gameExitBtn.hide()
         else:
@@ -408,10 +413,13 @@ class dnGameWindow(QtWidgets.QWidget):
         """
         Reset the game and deck.
         """
+        self.restartBtn.hide()
         g = self.game
         score = g.resetScore()
-        self.setGlobalMsg("Score: " + str(score) +
-                          ", High Score: " + str(g.getHighScore()))
+
+        self.setMessage(
+            "Score: " + str(score) +
+            ", High Score: " + str(g.getHighScore()))
         g.resetDeck()
         g.setRandCard2(None)
         if not self.isHumanPlayer:
@@ -464,10 +472,11 @@ class dnGameWindow(QtWidgets.QWidget):
         state = bp.getState()
         bestAction = bp.getAction(g, state)
         score = g.getScore()
-        self.setGlobalMsg("Score: " + str(score) +
-                          ", High Score: " + str(g.getHighScore()) +
-                          "\n Best action is " + bestAction +
-                          "\n Select the card that displayed")
+        self.setMessage(
+            "Score: " + str(score) +
+            ", High Score: " + str(g.getHighScore()) +
+            "\n Best action is " + bestAction +
+            "\n Select the card that displayed")
         self.nextEntry.show()
         self.card1.show()
         self.card2.show()
