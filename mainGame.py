@@ -55,7 +55,7 @@ class dnGameWindow(QtWidgets.QWidget):
         self.setLabelBgColor(self.card1, color, 255)
         self.setLabelBgColor(self.card2, color, 255)
 
-    def createButton(self, name, size, pos, func):
+    def createPushButton(self, name, size, pos, func):
         btn = QtWidgets.QPushButton(name, self)
         btn.resize(size[0], size[1])
         btn.move(pos[0], pos[1])
@@ -63,37 +63,64 @@ class dnGameWindow(QtWidgets.QWidget):
         return btn
 
     def initMainMenu(self):
-        self.computerBtn = self.createButton(name="Computer",
-                                             size=(100, 100), pos=(150, 100), func=self.startBotGame)
-        self.playBtn = self.createButton(name="Play",
-                                         size=(100, 100), pos=(350, 100), func=self.startHumanGame)
-        menuBtn = self.createButton(name="Main Menu",
-                                    size=(75, 20), pos=(525, 0), func=self.showMainMenu)
-        exitBtn = self.createButton(name="Exit Game",
-                                    size=(75, 30), pos=(525, 270), func=self.exitApp)
+        self.computerBtn = self.createPushButton(
+            name="Computer",
+            size=(100, 100),
+            pos=(150, 100),
+            func=self.startBotGame)
+        self.playBtn = self.createPushButton(
+            name="Play",
+            size=(100, 100),
+            pos=(350, 100),
+            func=self.startHumanGame)
+        self.menuBtn = self.createPushButton(
+            name="Main Menu",
+            size=(75, 20),
+            pos=(375, 280),
+            func=self.showMainMenu)
+        self.exitBtn = self.createPushButton(
+            name="Exit Game",
+            size=(75, 20),
+            pos=(525, 280),
+            func=self.exitApp)
 
     def initTextBox(self):
         self.textbox = QtWidgets.QLabel("", self)
-        self.textbox.resize(200, 30)
-        self.textbox.move(375, 30)
+        self.textbox.resize(250, 40)
+        self.textbox.move(350, 30)
         self.textbox.setStyleSheet("QLabel { font: 9pt Lucida Console; \
-										background-color: black; \
-										color: #88d471 }")
+                                    background-color: black; \
+                                    color: #88d471 }")
         self.textbox.setAlignment(QtCore.Qt.AlignHCenter)
         self.textbox.setFrameStyle(
             QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken)
 
     def initGameButtons(self):
-        self.higherBtn = self.createButton(name="Higher",
-                                           size=(75, 75), pos=(390, 100), func=self.gameChoose)
-        self.lowerBtn = self.createButton(name="Lower",
-                                          size=(75, 75), pos=(490, 100), func=self.gameChoose)
-        self.contBtn = self.createButton(name="Continue?",
-                                         size=(75, 20), pos=(390, 120), func=self.gameStep)
-        self.restartBtn = self.createButton(name="Restart",
-                                            size=(75, 20), pos=(440, 120), func=self.gameRestart)
-        self.gameExitBtn = self.createButton(name="Exit",
-                                             size=(75, 20), pos=(440, 150), func=self.gameExit)
+        self.higherBtn = self.createPushButton(
+            name="Higher",
+            size=(75, 75),
+            pos=(390, 100),
+            func=self.gameChoose)
+        self.lowerBtn = self.createPushButton(
+            name="Lower",
+            size=(75, 75),
+            pos=(490, 100),
+            func=self.gameChoose)
+        self.contBtn = self.createPushButton(
+            name="Continue?",
+            size=(75, 20),
+            pos=(390, 120),
+            func=self.gameStep)
+        self.restartBtn = self.createPushButton(
+            name="Restart",
+            size=(75, 20),
+            pos=(440, 120),
+            func=self.gameRestart)
+        self.gameExitBtn = self.createPushButton(
+            name="Exit",
+            size=(75, 20),
+            pos=(440, 150),
+            func=self.gameExit)
 
     def setLabelBgColor(self, label, color, alpha):
         label.setAutoFillBackground(True)
@@ -143,6 +170,7 @@ class dnGameWindow(QtWidgets.QWidget):
         self.playBtn.show()
         self.computerBtn.show()
 
+        self.menuBtn.hide()
         self.textbox.hide()
         self.higherBtn.hide()
         self.lowerBtn.hide()
@@ -167,6 +195,7 @@ class dnGameWindow(QtWidgets.QWidget):
         self.playBtn.hide()
         self.computerBtn.hide()
         self.textbox.show()
+        self.menuBtn.show()
         self.gameStep()
         self.card1.show()
         self.card2.show()
@@ -181,6 +210,7 @@ class dnGameWindow(QtWidgets.QWidget):
         self.sliderLabelLow.show()
         self.playBtn.hide()
         self.computerBtn.hide()
+        self.menuBtn.show()
         self.textbox.show()
         self.valsBox.show()
         self.initEntry.show()
@@ -202,10 +232,10 @@ class dnGameWindow(QtWidgets.QWidget):
     # Game step functions
 
     def gameStep(self):
-        """ 
-        Go to the next step of the game. 
-        If game started, draw a card from the deck and set it has the left card. 
-        Otherwise, move the right card to the left.
+        """
+        Go to the next step of the game.
+        If game started, draw a card from the deck and set it has the
+        left card. Otherwise, move the right card to the left.
         """
         g = self.game
         deck = g.getGameDeck()
@@ -241,8 +271,8 @@ class dnGameWindow(QtWidgets.QWidget):
 
     def gameStepBot(self, randCard, randCard2):
         """
-        Bot player needs to update its variables.
-        Also, get the best action for current step.
+        Bot player needs to update its variables. Also, get the best
+        action for current step.
         """
         g = self.game
         bp = self.botPlayer
@@ -257,8 +287,9 @@ class dnGameWindow(QtWidgets.QWidget):
                           "\n Best action is " + bestAction)
 
     def updateCardImage(self, label, path, pos):
-        """	
-        Get the card image from file path, then set picture to the LABEL at POS	
+        """
+        Get the card image from file path, then set picture to the LABEL
+        at POS
         """
         label.move(pos[0], pos[1])
         pixmap = QtGui.QPixmap(directoryPath + path).scaledToWidth(150)
@@ -266,7 +297,8 @@ class dnGameWindow(QtWidgets.QWidget):
 
     def playerPhase(self):
         """
-        Player phase is when player predicts if the next card is higher or lower.
+        Player phase is when player predicts if next card is
+        higher or lower.
         """
         self.higherBtn.show()
         self.lowerBtn.show()
@@ -285,10 +317,10 @@ class dnGameWindow(QtWidgets.QWidget):
         self.gameExitBtn.show()
 
     def gameChoose(self):
-        """ 
-        Play the game. User clicks on a choice button. 
+        """
+        Play the game. User clicks on a choice button.
         We get a draw a card from the deck.
-        Compare choice with drawn card and send to next state. 
+        Compare choice with drawn card and send to next state.
         """
         g = self.game
         deck = g.getGameDeck()
@@ -316,8 +348,8 @@ class dnGameWindow(QtWidgets.QWidget):
             self.gameLose()
 
     def gameWin(self):
-        """ 
-        If you win, update score, ask if exit or continue. 
+        """
+        If you win, update score, ask if exit or continue.
         """
         g = self.game
         score = g.incrementScore()
@@ -329,8 +361,8 @@ class dnGameWindow(QtWidgets.QWidget):
             self.botDecideExitPhase()
 
     def gameTie(self):
-        """	
-        If you tie, ask if exit or continue. 
+        """
+        If you tie, ask if exit or continue.
         """
         self.gameExitBtn.move(490, 120)
         self.transitionPhase(False)
@@ -338,8 +370,8 @@ class dnGameWindow(QtWidgets.QWidget):
             self.botDecideExitPhase()
 
     def gameLose(self):
-        """ 
-        If you lose, show score and exit. 
+        """
+        If you lose, show score and exit.
         """
         if not self.isHumanPlayer:
             self.botPlayer.setScore(0)
@@ -364,8 +396,8 @@ class dnGameWindow(QtWidgets.QWidget):
             self.contBtn.hide()
 
     def gameExit(self):
-        """	
-        End the game, obtain final score. 
+        """
+        End the game, obtain final score.
         """
         self.restartBtn.move(440, 120)
         self.restartBtn.show()
@@ -373,8 +405,8 @@ class dnGameWindow(QtWidgets.QWidget):
         self.gameExitBtn.hide()
 
     def gameRestart(self):
-        """ 
-        Reset the game and deck. 
+        """
+        Reset the game and deck.
         """
         g = self.game
         score = g.resetScore()
@@ -400,10 +432,16 @@ class dnGameWindow(QtWidgets.QWidget):
         self.valsBox.resize(75, 20)
         self.valsBox.move(375, 100)
 
-        self.initEntry = self.createButton(name='Display card',
-                                           size=(85, 30), pos=(435, 220), func=self.initBot)
-        self.nextEntry = self.createButton(name='Display card',
-                                           size=(85, 30), pos=(435, 220), func=self.onClick)
+        self.initEntry = self.createPushButton(
+            name='Display card',
+            size=(85, 30),
+            pos=(435, 220),
+            func=self.initBot)
+        self.nextEntry = self.createPushButton(
+            name='Display card',
+            size=(85, 30),
+            pos=(435, 220),
+            func=self.onClick)
 
     def initBot(self):
         """
@@ -428,14 +466,15 @@ class dnGameWindow(QtWidgets.QWidget):
         score = g.getScore()
         self.setGlobalMsg("Score: " + str(score) +
                           ", High Score: " + str(g.getHighScore()) +
-                          "\n Best action is " + bestAction)
+                          "\n Best action is " + bestAction +
+                          "\n Select the card that displayed")
         self.nextEntry.show()
         self.card1.show()
         self.card2.show()
 
     def onClick(self):
-        """ 
-        Display the card entered in the input text fields. 
+        """
+        Display the card entered in the input text fields.
         Give the best action for the current state.
         """
         g = self.game
