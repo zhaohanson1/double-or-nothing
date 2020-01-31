@@ -119,7 +119,7 @@ def compareValue(value1, value2):
 
 def gameDecision(card1, card2, choice):
     """
-    Evaluates the game for the given choice. 
+    Evaluates the game for the given choice.
     Return 1 if it's a win, 0 if tie, and -1 if loss
     """
     value1 = getValue(card1)

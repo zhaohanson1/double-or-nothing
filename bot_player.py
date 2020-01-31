@@ -62,7 +62,7 @@ class BotPlayer:
         return (2 * p) - 1
 
     def getAction(self, game, state):
-        if self.getUnknown(state) == None:
+        if self.getUnknown(state) is None:
             possibleAct = ["Higher", "Lower"]
             baseVal = self.getBase(state)
             counts = self.getCounts(state)[baseVal]
@@ -88,8 +88,8 @@ class BotPlayer:
                 winrate = 0.5
 
             print(winrate)
-
-            if self.expectancyPcnt(winrate) > self.expectancyPcnt(game.getRisk() / 100):
+            risk = game.getRisk()
+            if self.expectancyPcnt(winrate) > self.expectancyPcnt(risk / 100):
                 return "Continue?"
             else:
                 return "Exit"
