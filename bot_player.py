@@ -1,9 +1,16 @@
 import double_or_nothing_util as dnUtil
 import sys
 import math
+from enum import Enum
 
 
 class BotPlayer:
+
+    class Action(Enum):
+        Higher = 0
+        Lower = 1
+        Continue = 2
+        Exit = 3
 
     def __init__(self):
         self.state = [None, None, None, False]
@@ -63,17 +70,19 @@ class BotPlayer:
 
     def getAction(self, game, state):
         if self.getUnknown(state) is None:
-            possibleAct = ["Higher", "Lower"]
             baseVal = self.getBase(state)
             counts = self.getCounts(state)[baseVal]
             if counts[0] > counts[1]:
-                return "Higher"
+                return self.Action.Higher.name
             elif counts[0] < counts[1]:
-                return "Lower"
+                return self.Action.Lower.name
             else:
-                return "Higher" if dnUtil.random.random() > 50 else "Lower"
+                if dnUtil.random.random() > 50:
+                    return self.Action.Higher.name
+                else:
+                    return self.Action.Lower.name
         elif self.getLoseBool(state):
-            return "Exit"
+            return self.Action.Exit.name
         else:
             nextVal = self.getUnknown(state)
             nextCounts = self.getCounts(state)[nextVal]
@@ -90,9 +99,9 @@ class BotPlayer:
             print(winrate)
             risk = game.getRisk()
             if self.expectancyPcnt(winrate) > self.expectancyPcnt(risk / 100):
-                return "Continue?"
+                return self.Action.Continue.name
             else:
-                return "Exit"
+                return self.Action.Exit.name
 
     def updateBotCounts(self, drawCard):
         nextVal = dnUtil.getValue(drawCard)
