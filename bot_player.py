@@ -3,6 +3,7 @@ import sys
 import math
 from enum import Enum
 
+
 class BotPlayer:
 
     class Action(Enum):
