@@ -1,16 +1,24 @@
 import random
 import itertools
+from enum import Enum
 
 valuesList = ["2", "3", "4", "5", "6", "7", "8", "9", "10",
               "jack", "queen", "king", "ace"]
 suitsList = ["clubs", "diamonds", "hearts", "spades"]
 
 
+class Action(Enum):
+    Higher = 0
+    Lower = 1
+    Continue = 2
+    Exit = 3
+
+
 class DoubleOrNothingGame:
 
     def __init__(self, deck):
-        self.randCard = None
-        self.randCard2 = None
+        self.cardOne = None
+        self.cardTwo = None
         self.deck = deck
         self.score = 1
         self.highScore = 0
@@ -26,7 +34,7 @@ class DoubleOrNothingGame:
         self.__init__(getDeck())
 
     def getGameState(self):
-        return (self.randCard, self.randCard2, self.deck)
+        return (self.cardOne, self.cardTwo, self.deck)
 
     def getScore(self):
         return self.score
@@ -50,17 +58,17 @@ class DoubleOrNothingGame:
     def getGameDeck(self):
         return self.deck
 
-    def setRandCard(self, card):
-        self.randCard = card
+    def setCardOne(self, card):
+        self.cardOne = card
 
-    def setRandCard2(self, card):
-        self.randCard2 = card
+    def setCardTwo(self, card):
+        self.cardTwo = card
 
-    def getRandCard(self):
-        return self.randCard
+    def getCardOne(self):
+        return self.cardOne
 
-    def getRandCard2(self):
-        return self.randCard2
+    def getCardTwo(self):
+        return self.cardTwo
 
 
 def getDeck():
@@ -128,6 +136,6 @@ def gameDecision(card1, card2, choice):
     if comp == 0:
         return 0
     elif comp < 0:
-        return 1 if choice == "Higher" else -1
+        return 1 if choice is Action.Higher else -1
     else:
-        return 1 if choice == "Lower" else -1
+        return 1 if choice is Action.Lower else -1

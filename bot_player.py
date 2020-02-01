@@ -1,27 +1,20 @@
 import double_or_nothing_util as dnUtil
 import sys
 import math
-from enum import Enum
 
 
 class BotPlayer:
 
-    class Action(Enum):
-        Higher = 0
-        Lower = 1
-        Continue = 2
-        Exit = 3
-
     def __init__(self):
+        self.resetBot()
+
+    def resetBot(self):
         self.state = [None, None, None, False]
         self.score = 0
         counts = {}
         for value in dnUtil.valuesList:
             counts[value] = calcDefaultCount(value)
         self.state[2] = counts
-
-    def resetBot(self):
-        self.__init__()
 
     def getState(self):
         return self.state
@@ -41,10 +34,10 @@ class BotPlayer:
     def setBase(self, card):
         self.state[0] = dnUtil.getValue(card)
 
-    def getUnknown(self, state):
+    def getUnknownCard(self, state):
         return state[1]
 
-    def setUnknown(self, card):
+    def setUnknownCard(self, card):
         if card is not None:
             self.state[1] = dnUtil.getValue(card)
         else:
@@ -69,22 +62,22 @@ class BotPlayer:
         return (2 * p) - 1
 
     def getAction(self, game, state):
-        if self.getUnknown(state) is None:
+        if self.getUnknownCard(state) is None:
             baseVal = self.getBase(state)
             counts = self.getCounts(state)[baseVal]
             if counts[0] > counts[1]:
-                return self.Action.Higher.name
+                return dnUtil.Action.Higher
             elif counts[0] < counts[1]:
-                return self.Action.Lower.name
+                return dnUtil.Action.Lower
             else:
                 if dnUtil.random.random() > 50:
-                    return self.Action.Higher.name
+                    return dnUtil.Action.Higher
                 else:
-                    return self.Action.Lower.name
+                    return dnUtil.Action.Lower
         elif self.getLoseBool(state):
-            return self.Action.Exit.name
+            return dnUtil.Action.Exit
         else:
-            nextVal = self.getUnknown(state)
+            nextVal = self.getUnknownCard(state)
             nextCounts = self.getCounts(state)[nextVal]
             deckSize = sum(nextCounts)
             high, low, tie = nextCounts
@@ -96,15 +89,14 @@ class BotPlayer:
             else:
                 winrate = 0.5
 
-            print(winrate)
             risk = game.getRisk()
             if self.expectancyPcnt(winrate) > self.expectancyPcnt(risk / 100):
-                return self.Action.Continue.name
+                return dnUtil.Action.Continue, winrate * 100
             else:
-                return self.Action.Exit.name
+                return dnUtil.Action.Exit, winrate * 100
 
-    def updateBotCounts(self, drawCard):
-        nextVal = dnUtil.getValue(drawCard)
+    def updateBotCounts(self, nextCard):
+        nextVal = dnUtil.getValue(nextCard)
         state = self.getState()
         counts = self.getCounts(state)
         newCount = counts.copy()
