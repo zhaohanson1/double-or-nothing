@@ -6,7 +6,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 
 directoryPath = "playing-cards-assets-master/png/"
 backCard = "back.png"
-
+background_path = "background1.jpg"
 
 class dnGameWindow(QtWidgets.QWidget):
 
@@ -20,17 +20,17 @@ class dnGameWindow(QtWidgets.QWidget):
 
     # Initializing Functions
     def initUI(self):
-        self.createWindowStyle("background1.jpg")
+        self.createWindowStyle(background_path)
         self.initButtonsAndLabels()
         self.initBotPlayerInterface()
         self.initSlider()
         self.showMainMenu()
         self.show()
 
-    def createWindowStyle(self, path):
+    def createWindowStyle(self, img_path):
         self.setGeometry(100, 100, 600, 300)
         self.setStyleSheet("QPushButton { font: 10pt Arial }")
-        bg_img = QtGui.QImage(path).scaled(
+        bg_img = QtGui.QImage(img_path).scaled(
             QtCore.QSize(600, 300))  # resize Image to widgets size
         palette = QtGui.QPalette()
         palette.setBrush(10, QtGui.QBrush(bg_img))  # 10 = WindowRole
@@ -241,24 +241,24 @@ class dnGameWindow(QtWidgets.QWidget):
         g = self.game
         deck = g.getGameDeck()
 
-        if g.getRandCard2() is None:
+        if g.getCardTwo() is None:
             newCard = dnUtil.drawCard(deck)
-            g.setRandCard(newCard)
+            g.setCardOne(newCard)
             self.botPlayer.updateBotCounts(newCard)
         else:
-            g.setRandCard(g.getRandCard2())
-            g.setRandCard2(None)
+            g.setCardOne(g.getCardTwo())
+            g.setCardTwo(None)
 
-        randCard = g.getRandCard()
-        randCard2 = g.getRandCard2()
+        cardOne = g.getCardOne()
+        cardTwo = g.getCardTwo()
 
-        self.updateCardImage(self.card1, randCard, [20, 20])
+        self.updateCardImage(self.card1, cardOne, [20, 20])
         self.updateCardImage(self.card2, backCard, [200, 20])
 
         if self.isHumanPlayer:
             self.gameStepHuman()
         else:
-            self.gameStepBot(randCard, randCard2)
+            self.gameStepBot(cardOne, cardTwo)
 
     def gameStepHuman(self):
         """
@@ -271,7 +271,7 @@ class dnGameWindow(QtWidgets.QWidget):
             ", High Score: " + str(g.getHighScore()))
         self.playerPhase()
 
-    def gameStepBot(self, randCard, randCard2):
+    def gameStepBot(self, cardOne, cardTwo):
         """
         Bot player needs to update its variables. Also, get the best
         action for current step.
@@ -279,8 +279,8 @@ class dnGameWindow(QtWidgets.QWidget):
         g = self.game
         bp = self.botPlayer
         self.contBtn.hide()
-        bp.setBase(randCard)
-        bp.setUnknown(randCard2)
+        bp.setBase(cardOne)
+        bp.setUnknownCard(cardTwo)
         state = bp.getState()
         bestAction = bp.getAction(g, state)
         score = g.getScore()
@@ -327,22 +327,22 @@ class dnGameWindow(QtWidgets.QWidget):
         """
         g = self.game
         deck = g.getGameDeck()
-        randCard = g.getRandCard()
-        randCard2 = dnUtil.drawCard(deck)
+        cardOne = g.getCardOne()
+        cardTwo = dnUtil.drawCard(deck)
 
-        g.setRandCard2(randCard2)
-        self.updateCardImage(self.card2, randCard2, [200, 20])
+        g.setCardTwo(cardTwo)
+        self.updateCardImage(self.card2, cardTwo, [200, 20])
         if not self.isHumanPlayer:
-            self.botPlayer.setUnknown(randCard2)
-            self.botPlayer.updateBotCounts(randCard2)
+            self.botPlayer.setUnknownCard(cardTwo)
+            self.botPlayer.updateBotCounts(cardTwo)
         choice = win.sender().text()
-        self.gameEval(randCard, randCard2, choice)
+        self.gameEval(cardOne, cardTwo, choice)
 
-    def gameEval(self, randCard, randCard2, choice):
+    def gameEval(self, cardOne, cardTwo, choice):
         """
         Check if the player chose the correct action.
         """
-        decision = dnUtil.gameDecision(randCard, randCard2, choice)
+        decision = dnUtil.gameDecision(cardOne, cardTwo, choice)
         if decision == 0:
             self.gameTie()
         elif decision == 1:
@@ -421,7 +421,7 @@ class dnGameWindow(QtWidgets.QWidget):
             "Score: " + str(score) +
             ", High Score: " + str(g.getHighScore()))
         g.resetDeck()
-        g.setRandCard2(None)
+        g.setCardTwo(None)
         if not self.isHumanPlayer:
             self.botPlayer = bp.BotPlayer()
             self.botPlayer.setScore(0)
@@ -449,7 +449,7 @@ class dnGameWindow(QtWidgets.QWidget):
             name='Display card',
             size=(85, 30),
             pos=(435, 220),
-            func=self.onClick)
+            func=self.botStep)
 
     def initBot(self):
         """
@@ -462,9 +462,9 @@ class dnGameWindow(QtWidgets.QWidget):
         entry1 = str(self.valsBox.currentText()).lower()
         randomSuit = dnUtil.suitsList[random.randint(0, 3)]
         card = dnUtil.getCardString(entry1, randomSuit)
-        g.setRandCard(card)
+        g.setCardOne(card)
         bp.setBase(card)
-        bp.setUnknown(None)
+        bp.setUnknownCard(None)
         bp.updateBotCounts(card)
         self.updateCardImage(self.card1, card, [20, 20])
         self.updateCardImage(self.card2, backCard, [200, 20])
@@ -481,23 +481,20 @@ class dnGameWindow(QtWidgets.QWidget):
         self.card1.show()
         self.card2.show()
 
-    def onClick(self):
+    def botStep(self):
         """
         Display the card entered in the input text fields.
         Give the best action for the current state.
         """
-        g = self.game
-        bp = self.botPlayer
-        entry1 = str(self.valsBox.currentText()).lower()
-
+        inputEntry = str(self.valsBox.currentText()).lower()
         randomSuit = dnUtil.suitsList[random.randint(0, 3)]
-        card = dnUtil.getCardString(entry1, randomSuit)
-        g.setRandCard2(card)
-        bp.setUnknown(card)
-        bp.updateBotCounts(card)
+        card = dnUtil.getCardString(inputEntry, randomSuit)
+        self.game.setCardTwo(card)
+        self.botPlayer.setUnknownCard(card)
+        self.botPlayer.updateBotCounts(card)
         self.updateCardImage(self.card2, card, [200, 20])
 
-        base = g.getRandCard()
+        base = self.game.getCardOne()
         baseVal = dnUtil.getValue(base)
         otherVal = dnUtil.getValue(card)
         if dnUtil.compareValue(baseVal, otherVal) > 0:

@@ -41,10 +41,10 @@ class BotPlayer:
     def setBase(self, card):
         self.state[0] = dnUtil.getValue(card)
 
-    def getUnknown(self, state):
+    def getUnknownCard(self, state):
         return state[1]
 
-    def setUnknown(self, card):
+    def setUnknownCard(self, card):
         if card is not None:
             self.state[1] = dnUtil.getValue(card)
         else:
@@ -69,7 +69,7 @@ class BotPlayer:
         return (2 * p) - 1
 
     def getAction(self, game, state):
-        if self.getUnknown(state) is None:
+        if self.getUnknownCard(state) is None:
             baseVal = self.getBase(state)
             counts = self.getCounts(state)[baseVal]
             if counts[0] > counts[1]:
@@ -84,7 +84,7 @@ class BotPlayer:
         elif self.getLoseBool(state):
             return self.Action.Exit.name
         else:
-            nextVal = self.getUnknown(state)
+            nextVal = self.getUnknownCard(state)
             nextCounts = self.getCounts(state)[nextVal]
             deckSize = sum(nextCounts)
             high, low, tie = nextCounts
@@ -103,8 +103,8 @@ class BotPlayer:
             else:
                 return self.Action.Exit.name
 
-    def updateBotCounts(self, drawCard):
-        nextVal = dnUtil.getValue(drawCard)
+    def updateBotCounts(self, nextCard):
+        nextVal = dnUtil.getValue(nextCard)
         state = self.getState()
         counts = self.getCounts(state)
         newCount = counts.copy()
