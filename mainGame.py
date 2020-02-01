@@ -8,6 +8,7 @@ directoryPath = "playing-cards-assets-master/png/"
 backCard = "back.png"
 background_path = "background1.jpg"
 
+
 class dnGameWindow(QtWidgets.QWidget):
 
     def __init__(self):
@@ -162,17 +163,17 @@ class dnGameWindow(QtWidgets.QWidget):
     def changeSliderValue(self):
         self.game.setRisk(self.slider.value())
 
-    # Menu Functions
-    def showMainMenu(self):
-        """
-        Show menu buttons and hide all non-menu buttons.
-        """
-        self.game.resetGame()
+    def toggleGameOn(self):
+        self.playBtn.hide()
+        self.computerBtn.hide()
+        self.textbox.show()
+        self.menuBtn.show()
+
+    def toggleGameOff(self):
         self.playBtn.show()
         self.computerBtn.show()
-
-        self.menuBtn.hide()
         self.textbox.hide()
+        self.menuBtn.hide()
         self.higherBtn.hide()
         self.lowerBtn.hide()
         self.contBtn.hide()
@@ -183,20 +184,35 @@ class dnGameWindow(QtWidgets.QWidget):
         self.valsBox.hide()
         self.initEntry.hide()
         self.nextEntry.hide()
-        self.slider.hide()
+
+    def showSlider(self):
+        self.sliderLabel.show()
+        self.sliderLabelHigh.show()
+        self.sliderLabelLow.show()
+        self.slider.show()
+
+    def hideSlider(self):
         self.sliderLabel.hide()
         self.sliderLabelHigh.hide()
         self.sliderLabelLow.hide()
+        self.slider.hide()
+
+    # Menu Functions
+    def showMainMenu(self):
+        """
+        Show menu buttons and hide all non-menu buttons.
+        """
+        self.game.resetGame()
+        self.toggleGameOff()
+        self.hideSlider()
 
     def startHumanGame(self):
         """
         Transition buttons to human game.
         """
         self.isHumanPlayer = True
-        self.playBtn.hide()
-        self.computerBtn.hide()
-        self.textbox.show()
-        self.menuBtn.show()
+        self.toggleGameOn()
+
         self.gameStep()
         self.card1.show()
         self.card2.show()
@@ -206,16 +222,12 @@ class dnGameWindow(QtWidgets.QWidget):
         Transition buttons to bot-assisted game.
         """
         self.isHumanPlayer = False
-        self.sliderLabel.show()
-        self.sliderLabelHigh.show()
-        self.sliderLabelLow.show()
-        self.playBtn.hide()
-        self.computerBtn.hide()
-        self.menuBtn.show()
-        self.textbox.show()
+        self.toggleGameOn()
+        self.showSlider()
+
         self.valsBox.show()
         self.initEntry.show()
-        self.slider.show()
+
         self.setMessage("Enter the first card value.")
 
     def exitApp(self):
@@ -238,19 +250,19 @@ class dnGameWindow(QtWidgets.QWidget):
         If game started, draw a card from the deck and set it has the
         left card. Otherwise, move the right card to the left.
         """
-        g = self.game
-        deck = g.getGameDeck()
 
-        if g.getCardTwo() is None:
+        deck = self.game.getGameDeck()
+
+        if self.game.getCardTwo() is None:
             newCard = dnUtil.drawCard(deck)
-            g.setCardOne(newCard)
+            self.game.setCardOne(newCard)
             self.botPlayer.updateBotCounts(newCard)
         else:
-            g.setCardOne(g.getCardTwo())
-            g.setCardTwo(None)
+            self.game.setCardOne(self.game.getCardTwo())
+            self.game.setCardTwo(None)
 
-        cardOne = g.getCardOne()
-        cardTwo = g.getCardTwo()
+        cardOne = self.game.getCardOne()
+        cardTwo = self.game.getCardTwo()
 
         self.updateCardImage(self.card1, cardOne, [20, 20])
         self.updateCardImage(self.card2, backCard, [200, 20])
@@ -258,17 +270,17 @@ class dnGameWindow(QtWidgets.QWidget):
         if self.isHumanPlayer:
             self.gameStepHuman()
         else:
+            self.nextEntry.show()
             self.gameStepBot(cardOne, cardTwo)
 
     def gameStepHuman(self):
         """
         Human player only needs to update score.
         """
-        g = self.game
-        score = g.getScore()
+        score = self.game.getScore()
         self.setMessage(
             "Score: " + str(score) +
-            ", High Score: " + str(g.getHighScore()))
+            ", High Score: " + str(self.game.getHighScore()))
         self.playerPhase()
 
     def gameStepBot(self, cardOne, cardTwo):
@@ -276,18 +288,16 @@ class dnGameWindow(QtWidgets.QWidget):
         Bot player needs to update its variables. Also, get the best
         action for current step.
         """
-        g = self.game
-        bp = self.botPlayer
         self.contBtn.hide()
-        bp.setBase(cardOne)
-        bp.setUnknownCard(cardTwo)
-        state = bp.getState()
-        bestAction = bp.getAction(g, state)
-        score = g.getScore()
+        self.botPlayer.setBase(cardOne)
+        self.botPlayer.setUnknownCard(cardTwo)
+        state = self.botPlayer.getState()
+        bestAction = self.botPlayer.getAction(self.game, state)
+        score = self.game.getScore()
         self.setMessage(
             "Score: " + str(score) +
-            ", High Score: " + str(g.getHighScore()) +
-            "\n Best action is " + bestAction)
+            ", High Score: " + str(self.game.getHighScore()) +
+            "\n Best action is " + bestAction.name)
 
     def updateCardImage(self, label, path, pos):
         """
@@ -301,7 +311,7 @@ class dnGameWindow(QtWidgets.QWidget):
     def playerPhase(self):
         """
         Player phase is when player predicts if next card is
-        higher or lower.
+        higher or lower. Show the action buttons.
         """
         self.higherBtn.show()
         self.lowerBtn.show()
@@ -325,17 +335,16 @@ class dnGameWindow(QtWidgets.QWidget):
         We get a draw a card from the deck.
         Compare choice with drawn card and send to next state.
         """
-        g = self.game
-        deck = g.getGameDeck()
-        cardOne = g.getCardOne()
+        deck = self.game.getGameDeck()
+        cardOne = self.game.getCardOne()
         cardTwo = dnUtil.drawCard(deck)
 
-        g.setCardTwo(cardTwo)
+        self.game.setCardTwo(cardTwo)
         self.updateCardImage(self.card2, cardTwo, [200, 20])
         if not self.isHumanPlayer:
             self.botPlayer.setUnknownCard(cardTwo)
             self.botPlayer.updateBotCounts(cardTwo)
-        choice = win.sender().text()
+        choice = dnUtil.Action[win.sender().text()]
         self.gameEval(cardOne, cardTwo, choice)
 
     def gameEval(self, cardOne, cardTwo, choice):
@@ -354,11 +363,10 @@ class dnGameWindow(QtWidgets.QWidget):
         """
         If you win, update score, ask if exit or continue.
         """
-        g = self.game
-        score = g.incrementScore()
+        score = self.game.incrementScore()
         self.setMessage(
             "Score: " + str(score) +
-            ", High Score: " + str(g.getHighScore()))
+            ", High Score: " + str(self.game.getHighScore()))
         self.gameExitBtn.move(490, 120)
         self.transitionPhase(False)
         if not self.isHumanPlayer:
@@ -387,18 +395,19 @@ class dnGameWindow(QtWidgets.QWidget):
         """
         Bot updates information and chooses post-choice strategy.
         """
-        g = self.game
         state = self.botPlayer.getState()
-        bestAction = self.botPlayer.getAction(g, state)
-        score = g.getScore()
+        bestAction, winrate = self.botPlayer.getAction(self.game, state)
+        score = self.game.getScore()
         self.setMessage(
             "Score: " + str(score) +
-            ", High Score: " + str(g.getHighScore()) +
-            "\n Best action is " + bestAction)
-        if bestAction == "Continue?":
+            ", High Score: " + str(self.game.getHighScore()) +
+            "\n Best action is " + bestAction.name +
+            "\n Chance of winning: {:.1f}%".format(winrate))
+        if bestAction is dnUtil.Action.Continue:
             self.gameExitBtn.hide()
         else:
             self.contBtn.hide()
+        self.nextEntry.hide()
 
     def gameExit(self):
         """
@@ -413,20 +422,19 @@ class dnGameWindow(QtWidgets.QWidget):
         """
         Reset the game and deck.
         """
-        self.restartBtn.hide()
-        g = self.game
-        score = g.resetScore()
-
-        self.setMessage(
-            "Score: " + str(score) +
-            ", High Score: " + str(g.getHighScore()))
-        g.resetDeck()
-        g.setCardTwo(None)
-        if not self.isHumanPlayer:
-            self.botPlayer = bp.BotPlayer()
-            self.botPlayer.setScore(0)
-
-        self.gameStep()
+        if self.isHumanPlayer:
+            self.restartBtn.hide()
+            score = self.game.resetScore()
+            self.setMessage(
+                "Score: " + str(score) +
+                ", High Score: " + str(self.game.getHighScore()))
+            self.game.resetDeck()
+            self.game.setCardTwo(None)
+            self.gameStep()
+        else:
+            self.botPlayer.resetBot()
+            self.showMainMenu()
+            self.startBotGame()
 
     # Bot related functions
     def initBotPlayerInterface(self):
@@ -451,31 +459,31 @@ class dnGameWindow(QtWidgets.QWidget):
             pos=(435, 220),
             func=self.botStep)
 
+    def getCardFromInput(self):
+        inputValue = str(self.valsBox.currentText()).lower()
+        randomSuit = dnUtil.suitsList[random.randint(0, 3)]
+        return dnUtil.getCardString(inputValue, randomSuit)
+
     def initBot(self):
         """
         Get information from input to set first card.
         """
-        g = self.game
-        bp = self.botPlayer
-
         self.initEntry.hide()
-        entry1 = str(self.valsBox.currentText()).lower()
-        randomSuit = dnUtil.suitsList[random.randint(0, 3)]
-        card = dnUtil.getCardString(entry1, randomSuit)
-        g.setCardOne(card)
-        bp.setBase(card)
-        bp.setUnknownCard(None)
-        bp.updateBotCounts(card)
+        card = self.getCardFromInput()
+        self.game.setCardOne(card)
+        self.botPlayer.setBase(card)
+        self.botPlayer.setUnknownCard(None)
+        self.botPlayer.updateBotCounts(card)
         self.updateCardImage(self.card1, card, [20, 20])
         self.updateCardImage(self.card2, backCard, [200, 20])
 
-        state = bp.getState()
-        bestAction = bp.getAction(g, state)
-        score = g.getScore()
+        state = self.botPlayer.getState()
+        bestAction = self.botPlayer.getAction(self.game, state)
+        score = self.game.getScore()
         self.setMessage(
             "Score: " + str(score) +
-            ", High Score: " + str(g.getHighScore()) +
-            "\n Best action is " + bestAction +
+            ", High Score: " + str(self.game.getHighScore()) +
+            "\n Best action is " + bestAction.name +
             "\n Select the card that displayed")
         self.nextEntry.show()
         self.card1.show()
@@ -486,9 +494,7 @@ class dnGameWindow(QtWidgets.QWidget):
         Display the card entered in the input text fields.
         Give the best action for the current state.
         """
-        inputEntry = str(self.valsBox.currentText()).lower()
-        randomSuit = dnUtil.suitsList[random.randint(0, 3)]
-        card = dnUtil.getCardString(inputEntry, randomSuit)
+        card = self.getCardFromInput()
         self.game.setCardTwo(card)
         self.botPlayer.setUnknownCard(card)
         self.botPlayer.updateBotCounts(card)
@@ -498,9 +504,9 @@ class dnGameWindow(QtWidgets.QWidget):
         baseVal = dnUtil.getValue(base)
         otherVal = dnUtil.getValue(card)
         if dnUtil.compareValue(baseVal, otherVal) > 0:
-            self.gameEval(base, card, "Lower")
+            self.gameEval(base, card, dnUtil.Action.Lower)
         else:
-            self.gameEval(base, card, "Higher")
+            self.gameEval(base, card, dnUtil.Action.Higher)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

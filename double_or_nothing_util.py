@@ -1,9 +1,17 @@
 import random
 import itertools
+from enum import Enum
 
 valuesList = ["2", "3", "4", "5", "6", "7", "8", "9", "10",
               "jack", "queen", "king", "ace"]
 suitsList = ["clubs", "diamonds", "hearts", "spades"]
+
+
+class Action(Enum):
+    Higher = 0
+    Lower = 1
+    Continue = 2
+    Exit = 3
 
 
 class DoubleOrNothingGame:
@@ -128,6 +136,6 @@ def gameDecision(card1, card2, choice):
     if comp == 0:
         return 0
     elif comp < 0:
-        return 1 if choice == "Higher" else -1
+        return 1 if choice is Action.Higher else -1
     else:
-        return 1 if choice == "Lower" else -1
+        return 1 if choice is Action.Lower else -1
