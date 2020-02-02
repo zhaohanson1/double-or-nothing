@@ -14,64 +14,7 @@ class Action(Enum):
     Exit = 3
 
 
-class DoubleOrNothingGame:
-
-    def __init__(self, deck):
-        self.cardOne = None
-        self.cardTwo = None
-        self.deck = deck
-        self.score = 1
-        self.highScore = 0
-        self.risk = 50
-
-    def setRisk(self, risk):
-        self.risk = risk
-
-    def getRisk(self):
-        return self.risk
-
-    def resetGame(self):
-        self.__init__(getDeck())
-
-    def getGameState(self):
-        return (self.cardOne, self.cardTwo, self.deck)
-
-    def getScore(self):
-        return self.score
-
-    def getHighScore(self):
-        return self.highScore
-
-    def incrementScore(self):
-        self.score *= 2
-        if self.score > self.highScore:
-            self.highScore = self.score
-        return self.score
-
-    def resetScore(self):
-        self.score = 1
-        return self.score
-
-    def resetDeck(self):
-        self.deck = getDeck()
-
-    def getGameDeck(self):
-        return self.deck
-
-    def setCardOne(self, card):
-        self.cardOne = card
-
-    def setCardTwo(self, card):
-        self.cardTwo = card
-
-    def getCardOne(self):
-        return self.cardOne
-
-    def getCardTwo(self):
-        return self.cardTwo
-
-
-def getDeck():
+def getNewDeck():
     deck = itertools.product(valuesList, suitsList)
     deck = list(deck)
     random.shuffle(deck)

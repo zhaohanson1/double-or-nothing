@@ -1,6 +1,7 @@
 import sys
 import random
 import double_or_nothing_util as dnUtil
+import double_or_nothing_game as dnGame
 import bot_player as bp
 from PyQt5 import QtWidgets, QtGui, QtCore
 
@@ -15,8 +16,7 @@ class dnGameWindow(QtWidgets.QWidget):
         super().__init__()
         self.isHumanPlayer = True
         self.botPlayer = bp.BotPlayer()
-        self.deck = dnUtil.getDeck()
-        self.game = dnUtil.DoubleOrNothingGame(self.deck)
+        self.game = dnGame.DoubleOrNothingGame()
         self.initUI()
 
     # Initializing Functions
