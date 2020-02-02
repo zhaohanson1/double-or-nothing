@@ -1,7 +1,7 @@
-Double or Nothing
+Higher or Lower
 =======
 
-Problem Formulation: You are playing a double or nothing game with a deck of cards without replacement. You initially draw the top card of the deck. 
+Problem Formulation: You are playing a  game with a deck of cards without replacement. You initially draw the top card of the deck. 
 On the first turn, you guess whether the next card will be higher or lower.
 Your reward for guessing correctly is 1 point and on the subsequent turns, you double your money. 
 However, if you lose, you will lose all of the money you have earned.
